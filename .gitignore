@@ -1,3 +1,9 @@
+# Raw / Processed Data
+images
+images/
+text
+text/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -3,6 +3,17 @@ from os.path import isfile, join
 from PIL import Image
 from PIL import ImageOps
 from PIL import ImageFilter
+import skimage.filters as filters
+import skimage.transform as transform
+import skimage.io as io
+import matplotlib
+import matplotlib.pyplot as plt
+import skimage.color as color
+
+#io.use_plugin('pil')
+
+#preprocess_library = 'Pillow'
+preprocess_library = 'skimage'
 
 def main():
     input_dir_path = join("images","input")
@@ -11,24 +22,58 @@ def main():
     for file in listdir(input_dir_path):
         input_file_path = join(input_dir_path, file)
         if isfile(input_file_path) and file.endswith(".png"):
+            print("Processing {file}".format(file=file))
             output_file_path = join(output_dir_path, file)
-            image = Image.open(input_file_path)
+            image = read_image(input_file_path)
             processed_image = preprocess(image)
-            # processed_image.show()
-            processed_image.save(output_file_path)
+            save_image(processed_image, output_file_path)
+
+
+def save_image(image, image_file_path):
+    print('Saving Image')
+    if preprocess_library == 'Pillow':
+        return image.save(image_file_path)
+    elif preprocess_library == 'skimage':
+        return io.imsave(image_file_path, image)
+    else:
+        raise ValueError("Invalid preprocess library: ${library}".format(library=preprocess_library))
+
+
+def read_image(image_file_path):
+    print('Reading Image')
+    if preprocess_library == 'Pillow':
+        return Image.open(image_file_path)
+    elif preprocess_library == 'skimage':
+        return io.imread(image_file_path)
+    else:
+        raise ValueError("Invalid preprocess library: ${library}".format(library=preprocess_library))
 
 
 def preprocess(image):
+    print('Preprocessing Image')
+    if preprocess_library == 'Pillow':
+        return preprocess_pillow(image)
+    elif preprocess_library == 'skimage':
+        return preprocess_skimage(image)
+    else:
+        raise ValueError("Invalid preprocess_library: '${library}'".format(library=preprocess_library))
+
+
+def preprocess_skimage(image):
+    grey_img = color.rgb2grey(image)
+    threshold = filters.threshold_local(grey_img, block_size=55)
+    bit_image = grey_img > threshold
+    upscale_factor = 2
+    large_img = transform.pyramid_expand(bit_image, upscale_factor)
+    print(large_img.shape)
+    return large_img
+
+
+def preprocess_pillow(image):
     upscale_factor = 2
     large_img = image.resize((image.size[0] * upscale_factor, image.size[1] * upscale_factor))
     greyscale_img = large_img.convert('L')
-    normalized_img = ImageOps.autocontrast(greyscale_img, 0.75)
-    #blurred_img = normalized_img.filter(ImageFilter.GaussianBlur)
-    singlebit_img = normalized_img.point(lambda x: 0 if x < 100 else 255, '1')
-    return singlebit_img
-    sharpened_img = singlebit_img.filter(ImageFilter.EDGE_ENHANCE)
-
-    return sharpened_img
+    return greyscale_img
 
 
 if __name__ == "__main__":

@@ -9,14 +9,18 @@ import skimage.io as io
 import matplotlib
 import matplotlib.pyplot as plt
 import skimage.color as color
+import skimage.exposure as exposure
+from toolz.functoolz import compose, pipe
+from functools import partial
 
-#io.use_plugin('pil')
+# io.use_plugin('pil')
 
-#preprocess_library = 'Pillow'
+# preprocess_library = 'Pillow'
 preprocess_library = 'skimage'
 
+
 def main():
-    input_dir_path = join("images","input")
+    input_dir_path = join("images", "input")
     output_dir_path = join("images", "output")
 
     for file in listdir(input_dir_path):
@@ -59,14 +63,19 @@ def preprocess(image):
         raise ValueError("Invalid preprocess_library: '${library}'".format(library=preprocess_library))
 
 
+def binarize(img, block_size):
+    threshold = filters.threshold_local(img, block_size)
+    return img > threshold
+
+
 def preprocess_skimage(image):
-    grey_img = color.rgb2grey(image)
-    threshold = filters.threshold_local(grey_img, block_size=55)
-    bit_image = grey_img > threshold
-    upscale_factor = 2
-    large_img = transform.pyramid_expand(bit_image, upscale_factor)
-    print(large_img.shape)
-    return large_img
+    return pipe(image,
+                color.rgb2gray,
+                #exposure.equalize_hist,
+                partial(exposure.adjust_gamma, gamma=0.44),
+                #partial(binarize, block_size=35),
+                #partial(transform.pyramid_expand, upscale=2)
+                )
 
 
 def preprocess_pillow(image):

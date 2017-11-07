@@ -8,12 +8,14 @@ import skimage.transform as transform
 import skimage.io as io
 import matplotlib
 import matplotlib.pyplot as plt
+import skimage.restoration as restoration
 import skimage.color as color
 import skimage.exposure as exposure
+import skimage.util as skutil
 from toolz.functoolz import compose, pipe
 from functools import partial
 
-# io.use_plugin('pil')
+io.use_plugin('pil')
 
 # preprocess_library = 'Pillow'
 preprocess_library = 'skimage'
@@ -63,18 +65,17 @@ def preprocess(image):
         raise ValueError("Invalid preprocess_library: '${library}'".format(library=preprocess_library))
 
 
-def binarize(img, block_size):
-    threshold = filters.threshold_local(img, block_size)
-    return img > threshold
-
-
 def preprocess_skimage(image):
     return pipe(image,
                 color.rgb2gray,
+                #partial(restoration.denoise_bilateral, multichannel=False),
                 #exposure.equalize_hist,
-                partial(exposure.adjust_gamma, gamma=0.44),
-                #partial(binarize, block_size=35),
-                #partial(transform.pyramid_expand, upscale=2)
+                partial(exposure.adjust_gamma, gamma=0.75),
+                #lambda img: img > filters.threshold_local(img, block_size=11, method='mean'),
+                #lambda img: img > filters.threshold_otsu(img),
+                #lambda img: img > filters.threshold_local(img, block_size=7),
+                #skutil.img_as_int,
+                partial(transform.pyramid_expand, upscale=2)
                 )
 
 

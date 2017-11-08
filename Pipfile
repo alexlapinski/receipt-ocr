@@ -12,6 +12,11 @@ setuptools = "*"
 
 [packages]
 
+pillow = "*"
+tesserocr = "*"
+scikit-image = "*"
+matplotlib = "*"
+toolz = "*"
 
 
 [requires]

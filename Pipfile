@@ -4,10 +4,6 @@ verify_ssl = true
 [requires]
 python_version = "3.6"
 [packages]
-
-tesserocr = "*"
-pillow = "*"
-scikit-image = "*"
 toolz = "*"
 
 

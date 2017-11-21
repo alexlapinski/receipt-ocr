@@ -11,13 +11,26 @@ A python library to perform OCR on receipts and produce json results.
 
 Requirements
 ============
+* Python3 - `Install Python3 <http://docs.python-guide.org/en/latest/starting/installation/>`_
+* pipenv - `Install pipenv <https://docs.pipenv.org/install.html#installing-pipenv>`_
+* tesseract - `Install prebuilt binary <https://github.com/tesseract-ocr/tesseract/wiki>`_
 
-tesseract dependencies for the tesserocr python package.
-https://github.com/sirfz/tesserocr
+Getting Started
+===============
+Install `Requirements`_
 
-Installation
-============
+Clone this repository
+
+::
+
+    $ git clone git@github.com:alexlapinski/receipt-ocr.git
+
+Install dependencies (and create virtual env if needed)
+
+::
+
+  $ pipenv install
 
 Usage
 =====
-
+TBD
